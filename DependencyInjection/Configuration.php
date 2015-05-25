@@ -77,7 +77,6 @@ class Configuration implements ConfigurationInterface
         $this->addRegistrationSection($rootNode);
         $this->addResettingSection($rootNode);
         $this->addServiceSection($rootNode);
-        $this->addTemplateSection($rootNode);
         $this->addGroupSection($rootNode);
 
         return $treeBuilder;
@@ -93,6 +92,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('form')
                             ->addDefaultsIfNotSet()
+                            ->fixXmlConfig('validation_group')
                             ->children()
                                 ->scalarNode('type')->defaultValue('fos_user_profile')->end()
                                 ->scalarNode('name')->defaultValue('fos_user_profile_form')->end()
@@ -226,19 +226,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addTemplateSection(ArrayNodeDefinition $node)
-    {
-        $node
-            ->children()
-                ->arrayNode('template')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('engine')->defaultValue('twig')->end()
-                    ->end()
-                ->end()
-            ->end();
-    }
-
     private function addGroupSection(ArrayNodeDefinition $node)
     {
         $node
@@ -250,6 +237,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('group_manager')->defaultValue('fos_user.group_manager.default')->end()
                         ->arrayNode('form')
                             ->addDefaultsIfNotSet()
+                            ->fixXmlConfig('validation_group')
                             ->children()
                                 ->scalarNode('type')->defaultValue('fos_user_group')->end()
                                 ->scalarNode('name')->defaultValue('fos_user_group_form')->end()

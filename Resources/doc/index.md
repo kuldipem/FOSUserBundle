@@ -45,7 +45,7 @@ Installation is a quick (I promise!) 7 step process:
 Add FOSUserBundle by running the command:
 
 ``` bash
-$ php composer.phar require friendsofsymfony/user-bundle '~2.0@dev'
+$ php composer.phar require friendsofsymfony/user-bundle "~2.0@dev"
 ```
 
 Composer will install the bundle to your project's `vendor/friendsofsymfony` directory.
@@ -184,6 +184,45 @@ Acme\UserBundle\Entity\User:
                 strategy: AUTO
 ```
 
+##### xml
+
+If you use xml to configure Doctrine you must add two files. The Entity and the orm.xml:
+
+```php
+<?php
+// src/Acme/UserBundle/Entity/User.php
+
+namespace Acme\UserBundle\Entity;
+
+use FOS\UserBundle\Model\User as BaseUser;
+
+/**
+ * User
+ */
+class User extends BaseUser
+{
+    public function __construct()
+    {
+        parent::__construct();
+        // your own logic
+    }
+}
+```
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- src/Acme/UserBundle/Resources/config/doctrine/User.orm.xml -->
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Acme\UserBundle\Entity\User" table="fos_user">
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+    </entity>
+</doctrine-mapping>
+```
+
 #### b) MongoDB User class
 
 If you're persisting your users via the Doctrine MongoDB ODM, then your `User`
@@ -288,7 +327,7 @@ security:
             pattern: ^/
             form_login:
                 provider: fos_userbundle
-                csrf_provider: form.csrf_provider
+                csrf_provider: security.csrf.token_manager # Use form.csrf_provider instead for Symfony <2.4
             logout:       true
             anonymous:    true
 
@@ -392,35 +431,15 @@ In YAML:
 
 ``` yaml
 # app/config/routing.yml
-fos_user_security:
-    resource: "@FOSUserBundle/Resources/config/routing/security.xml"
-
-fos_user_profile:
-    resource: "@FOSUserBundle/Resources/config/routing/profile.xml"
-    prefix: /profile
-
-fos_user_register:
-    resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
-    prefix: /register
-
-fos_user_resetting:
-    resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
-    prefix: /resetting
-
-fos_user_change_password:
-    resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"
-    prefix: /profile
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
 ```
 
 Or if you prefer XML:
 
 ``` xml
 <!-- app/config/routing.xml -->
-<import resource="@FOSUserBundle/Resources/config/routing/security.xml"/>
-<import resource="@FOSUserBundle/Resources/config/routing/profile.xml" prefix="/profile" />
-<import resource="@FOSUserBundle/Resources/config/routing/registration.xml" prefix="/register" />
-<import resource="@FOSUserBundle/Resources/config/routing/resetting.xml" prefix="/resetting" />
-<import resource="@FOSUserBundle/Resources/config/routing/change_password.xml" prefix="/profile" />
+<import resource="@FOSUserBundle/Resources/config/routing/all.xml"/>
 ```
 
 **Note:**
@@ -492,3 +511,4 @@ The following documents are available:
 - [Using a custom storage layer](custom_storage_layer.md)
 - [Configuration Reference](configuration_reference.md)
 - [Adding invitations to registration](adding_invitation_registration.md)
+- [Advanced routing configuration](routing.md)
